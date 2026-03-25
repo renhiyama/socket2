@@ -264,7 +264,7 @@ impl Socket {
             target_os = "freebsd",
             target_os = "fuchsia",
             target_os = "illumos",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "netbsd",
             target_os = "openbsd",
             target_os = "cygwin",
@@ -278,7 +278,7 @@ impl Socket {
             target_os = "freebsd",
             target_os = "fuchsia",
             target_os = "illumos",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "netbsd",
             target_os = "openbsd",
             target_os = "cygwin",
@@ -753,7 +753,7 @@ const fn set_common_type(ty: Type) -> Type {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -781,7 +781,7 @@ fn set_common_flags(socket: Socket) -> io::Result<Socket> {
             target_os = "fuchsia",
             target_os = "hurd",
             target_os = "illumos",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "netbsd",
             target_os = "openbsd",
             target_os = "espidf",
@@ -815,7 +815,7 @@ fn set_common_flags(socket: Socket) -> io::Result<Socket> {
     target_os = "freebsd",
     target_os = "fuchsia",
     target_os = "illumos",
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "netbsd",
     target_os = "openbsd",
     target_os = "cygwin",
@@ -831,7 +831,7 @@ fn set_common_accept_flags(socket: Socket) -> io::Result<Socket> {
             target_os = "fuchsia",
             target_os = "hurd",
             target_os = "illumos",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "netbsd",
             target_os = "openbsd",
             target_os = "espidf",
@@ -1003,7 +1003,7 @@ impl Socket {
     /// For more information about this option, see [`set_passcred`].
     ///
     /// [`set_passcred`]: Socket::set_passcred
-    #[cfg(any(target_os = "linux", target_os = "cygwin"))]
+    #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
     pub fn passcred(&self) -> io::Result<bool> {
         unsafe {
             getsockopt::<c_int>(self.as_raw(), sys::SOL_SOCKET, sys::SO_PASSCRED)
@@ -1015,7 +1015,7 @@ impl Socket {
     ///
     /// If this option is enabled, enables the receiving of the `SCM_CREDENTIALS`
     /// control messages.
-    #[cfg(any(target_os = "linux", target_os = "cygwin"))]
+    #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
     pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
         unsafe {
             setsockopt(
@@ -1034,7 +1034,7 @@ impl Socket {
     /// [`set_priority`]: Socket::set_priority
     #[cfg(all(
         feature = "all",
-        any(target_os = "linux", target_os = "android", target_os = "fuchsia")
+        any(any(target_os = "linux", target_os = "runixos"), target_os = "android", target_os = "fuchsia")
     ))]
     pub fn priority(&self) -> io::Result<u32> {
         unsafe {
@@ -1049,7 +1049,7 @@ impl Socket {
     /// queueing discipline.
     #[cfg(all(
         feature = "all",
-        any(target_os = "linux", target_os = "android", target_os = "fuchsia")
+        any(any(target_os = "linux", target_os = "runixos"), target_os = "android", target_os = "fuchsia")
     ))]
     pub fn set_priority(&self, priority: u32) -> io::Result<()> {
         unsafe {
@@ -1255,7 +1255,7 @@ impl Socket {
     /// For more information about this option, see [`set_ip_transparent_v4`].
     ///
     /// [`set_ip_transparent_v4`]: Socket::set_ip_transparent_v4
-    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "android")))]
+    #[cfg(all(feature = "all", any(any(target_os = "linux", target_os = "runixos"), target_os = "android")))]
     pub fn ip_transparent_v4(&self) -> io::Result<bool> {
         unsafe {
             getsockopt::<c_int>(self.as_raw(), sys::IPPROTO_IP, libc::IP_TRANSPARENT)
@@ -1278,7 +1278,7 @@ impl Socket {
     ///
     /// TProxy redirection with the iptables TPROXY target also
     /// requires that this option be set on the redirected socket.
-    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "android")))]
+    #[cfg(all(feature = "all", any(any(target_os = "linux", target_os = "runixos"), target_os = "android")))]
     pub fn set_ip_transparent_v4(&self, transparent: bool) -> io::Result<()> {
         unsafe {
             setsockopt(
@@ -1481,7 +1481,7 @@ impl Socket {
     /// For more information about this option, see [`set_multicast_all_v4`].
     ///
     /// [`set_multicast_all_v4`]: Socket::set_multicast_all_v4
-    #[cfg(all(feature = "all", target_os = "linux"))]
+    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "runixos")))]
     pub fn multicast_all_v4(&self) -> io::Result<bool> {
         unsafe {
             getsockopt::<c_int>(self.as_raw(), sys::IPPROTO_IP, libc::IP_MULTICAST_ALL)
@@ -1499,7 +1499,7 @@ impl Socket {
     /// messages only from the groups that have been explicitly
     /// joined (for example via the `IP_ADD_MEMBERSHIP` option) on
     /// this particular socket.
-    #[cfg(all(feature = "all", target_os = "linux"))]
+    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "runixos")))]
     pub fn set_multicast_all_v4(&self, all: bool) -> io::Result<()> {
         unsafe {
             setsockopt(
@@ -1724,7 +1724,7 @@ impl Socket {
         any(
             target_os = "android",
             target_os = "fuchsia",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "windows",
         )
     ))]
@@ -1792,9 +1792,9 @@ impl Socket {
             setsockopt(
                 self.as_raw(),
                 sys::IPPROTO_IPV6,
-                #[cfg(target_os = "linux")]
+                #[cfg(any(target_os = "linux", target_os = "runixos"))]
                 sys::IPV6_HDRINCL,
-                #[cfg(not(target_os = "linux"))]
+                #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
                 sys::IP_HDRINCL,
                 included as c_int,
             )
@@ -1806,7 +1806,7 @@ impl Socket {
     /// For more information about this option, see [`set_ip_transparent_v6`].
     ///
     /// [`set_ip_transparent_v6`]: Socket::set_ip_transparent_v6
-    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "android")))]
+    #[cfg(all(feature = "all", any(any(target_os = "linux", target_os = "runixos"), target_os = "android")))]
     pub fn ip_transparent_v6(&self) -> io::Result<bool> {
         unsafe {
             getsockopt::<c_int>(self.as_raw(), sys::IPPROTO_IPV6, libc::IPV6_TRANSPARENT)
@@ -1829,7 +1829,7 @@ impl Socket {
     ///
     /// TProxy redirection with the iptables TPROXY target also
     /// requires that this option be set on the redirected socket.
-    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "android")))]
+    #[cfg(all(feature = "all", any(any(target_os = "linux", target_os = "runixos"), target_os = "android")))]
     pub fn set_ip_transparent_v6(&self, transparent: bool) -> io::Result<()> {
         unsafe {
             setsockopt(
@@ -1924,7 +1924,7 @@ impl Socket {
     /// For more information about this option, see [`set_multicast_all_v6`].
     ///
     /// [`set_multicast_all_v6`]: Socket::set_multicast_all_v6
-    #[cfg(all(feature = "all", target_os = "linux"))]
+    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "runixos")))]
     pub fn multicast_all_v6(&self) -> io::Result<bool> {
         unsafe {
             getsockopt::<c_int>(self.as_raw(), sys::IPPROTO_IPV6, libc::IPV6_MULTICAST_ALL)
@@ -1942,7 +1942,7 @@ impl Socket {
     /// messages only from the groups that have been explicitly
     /// joined (for example via the `IPV6_ADD_MEMBERSHIP` option) on
     /// this particular socket.
-    #[cfg(all(feature = "all", target_os = "linux"))]
+    #[cfg(all(feature = "all", any(target_os = "linux", target_os = "runixos")))]
     pub fn set_multicast_all_v6(&self, all: bool) -> io::Result<()> {
         unsafe {
             setsockopt(
@@ -2190,7 +2190,7 @@ impl Socket {
     /// Get the value for the `IP6T_SO_ORIGINAL_DST` option on this socket.
     #[cfg(all(
         feature = "all",
-        any(target_os = "android", target_os = "linux", target_os = "windows")
+        any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "windows")
     ))]
     pub fn original_dst_v6(&self) -> io::Result<SockAddr> {
         sys::original_dst_v6(self.as_raw())
@@ -2235,7 +2235,7 @@ impl Socket {
             target_os = "illumos",
             target_os = "ios",
             target_os = "visionos",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "macos",
             target_os = "netbsd",
             target_os = "tvos",
@@ -2266,7 +2266,7 @@ impl Socket {
             target_os = "illumos",
             target_os = "ios",
             target_os = "visionos",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "macos",
             target_os = "netbsd",
             target_os = "tvos",
